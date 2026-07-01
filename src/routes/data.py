@@ -22,7 +22,7 @@ data_router = APIRouter(
 @data_router.post("/upload/{project_id}")
 async def upload_data(request: Request, project_id: str, file: UploadFile, app_settings: Settings = Depends(get_settings)):
  
-    project_model = ProjectModel(db_client=request.app.db_client)
+    project_model = await ProjectModel.create_instance(db_client=request.app.db_client)
 
     project = await project_model.get_project_or_create_one(project_id)
 
@@ -69,11 +69,11 @@ async def process_endpoint(request: Request, project_id:str, process_request: Pr
     overlap_size = process_request.overlap_size
     do_reset = process_request.do_reset
 
-    project_model = ProjectModel(db_client=request.app.db_client)
+    project_model = await ProjectModel.create_instance(db_client=request.app.db_client)
 
     project = await project_model.get_project_or_create_one(project_id)
 
-    chunk_model = DataChunkModel(db_client=request.app.db_client)
+    chunk_model = await DataChunkModel.create_instance(db_client=request.app.db_client)
 
 
     if do_reset==1:
@@ -95,7 +95,7 @@ async def process_endpoint(request: Request, project_id:str, process_request: Pr
 
     file_chunks_records = [DataChunk(chunk_text=chunk.page_content, chunk_metadata=chunk.metadata, chunk_order=i+1, chunk_project_id=project.id) for i, chunk in enumerate(file_chunks)]
 
-    chunk_model = DataChunkModel(db_client=request.app.db_client)
+    chunk_model = await DataChunkModel.create_instance(db_client=request.app.db_client)
 
     no_records = await chunk_model.insert_many_chunks(file_chunks_records)
 
