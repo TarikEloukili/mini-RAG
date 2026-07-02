@@ -36,7 +36,7 @@ class OPENAIProvider(LLMInterface):
 
 
     def process_text(self, text: str):
-        return text[:self.default_input_max_characters]
+        return text[:self.default_input_max_characters].strip()
 
     def generate_text(self, prompt: str, chat_history: list = None, max_output_tokens: int = None, temperature: float = None):
         if not self.client:
@@ -93,6 +93,6 @@ class OPENAIProvider(LLMInterface):
     def construct_prompt(self, prompt: str, role: str):
         return {
             "role": role,
-            "content": prompt
+            "content": self.process_text(prompt)
         }
 
